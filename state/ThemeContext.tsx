@@ -6,7 +6,7 @@ import { defaultPreset } from '../data/defaultPreset';
 type ThemeCtx = {
   tokens: ThemeTokens;
   mode: Mode;
-  setTokens: (updater: (t: ThemeTokens) => ThemeTokens) => void;
+  setTokens: (updater: ThemeTokens | ((t: ThemeTokens) => ThemeTokens)) => void;
   setMode: (m: Mode) => void;
   activeModeTokens: ThemeTokens['light'] | ThemeTokens['dark'];
 };
@@ -17,7 +17,7 @@ export const ThemeProvider: React.FC<React.PropsWithChildren<{}>> = ({ children 
   const [tokens, setTokensState] = useState<ThemeTokens>(defaultPreset);
   const [mode, setMode] = useState<Mode>('light');
 
-  const setTokens = (updater: (t: ThemeTokens) => ThemeTokens) => {
+  const setTokens = (updater: ThemeTokens | ((t: ThemeTokens) => ThemeTokens)) => {
     setTokensState(updater);
   };
   

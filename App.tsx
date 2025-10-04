@@ -3,8 +3,15 @@ import { ThemeProvider } from './state/ThemeContext';
 import Header from './components/Header';
 import EditorTabs from './components/Editor/EditorTabs';
 import PreviewSwitcher from './components/Preview/PreviewSwitcher';
+import { PreviewProvider, usePreview } from './state/PreviewContext';
 
-const AppContent: React.FC = () => {
+const AppLayout: React.FC = () => {
+    const { isPreviewFullScreen } = usePreview();
+
+    if (isPreviewFullScreen) {
+        return <PreviewSwitcher />;
+    }
+
     return (
         <div className="flex flex-col h-screen font-sans antialiased bg-white text-zinc-900">
             <Header />
@@ -20,10 +27,13 @@ const AppContent: React.FC = () => {
     );
 };
 
+
 const App: React.FC = () => {
     return (
         <ThemeProvider>
-            <AppContent />
+            <PreviewProvider>
+                <AppLayout />
+            </PreviewProvider>
         </ThemeProvider>
     );
 };
