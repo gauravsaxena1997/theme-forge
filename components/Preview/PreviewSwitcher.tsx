@@ -11,6 +11,7 @@ import MessengerPreset from './presets/MessengerPreset';
 import { usePreview } from '../../state/PreviewContext';
 import { ExpandIcon, XIcon } from '../icons';
 import { ToastProvider } from '../ui/Toast';
+import { cn } from '../../lib/utils';
 
 type PreviewMode = 'presets' | 'components';
 type Preset = 'ecommerce' | 'travel' | 'dashboard' | 'chat' | 'messenger';
@@ -44,25 +45,35 @@ const PreviewSwitcher: React.FC = () => {
         ? 'h-screen w-screen'
         : 'p-4 md:p-6 h-full flex flex-col';
     
+    // Updated headerClasses for full screen mode
     const headerClasses = isPreviewFullScreen
-        ? 'flex items-center justify-between gap-4 mb-4 bg-white/80 backdrop-blur-sm p-2 rounded-lg border border-zinc-200 absolute top-4 left-4 right-4 z-20'
+        ? 'flex items-center justify-between gap-4 bg-white p-2 rounded-lg border border-zinc-200 shadow-md absolute top-4 left-4 right-4 z-20'
         : 'flex items-center justify-between gap-4 mb-4 bg-white p-2 rounded-lg border border-zinc-200 sticky top-0 z-10';
+
+    // Static classes for controls in full screen mode
+    const fullScreenButtonClasses = 'bg-transparent text-zinc-600 hover:bg-zinc-100';
+    const fullScreenActiveButtonClasses = 'bg-zinc-200 text-zinc-900 hover:bg-zinc-300';
+    const fullScreenSelectClasses = 'bg-white border-zinc-300 text-zinc-900 focus:ring-blue-500 focus:ring-1 focus:outline-none';
+    const fullScreenIconButtonClasses = 'bg-transparent text-zinc-600 hover:bg-zinc-100';
+
 
     return (
         <div className={containerClasses}>
             <div className={headerClasses}>
                 <div className="flex items-center gap-2">
                     <Button 
-                        variant={previewMode === 'presets' ? 'secondary' : 'ghost'} 
                         size="sm" 
                         onClick={() => setPreviewMode('presets')}
+                        variant={isPreviewFullScreen ? undefined : (previewMode === 'presets' ? 'secondary' : 'ghost')}
+                        className={isPreviewFullScreen ? (previewMode === 'presets' ? fullScreenActiveButtonClasses : fullScreenButtonClasses) : ''}
                     >
                         Preview
                     </Button>
                     <Button 
-                        variant={previewMode === 'components' ? 'secondary' : 'ghost'} 
                         size="sm"
                         onClick={() => setPreviewMode('components')}
+                        variant={isPreviewFullScreen ? undefined : (previewMode === 'components' ? 'secondary' : 'ghost')}
+                        className={isPreviewFullScreen ? (previewMode === 'components' ? fullScreenActiveButtonClasses : fullScreenButtonClasses) : ''}
                     >
                         UI Components
                     </Button>
@@ -72,12 +83,17 @@ const PreviewSwitcher: React.FC = () => {
                         <Select 
                             value={activePreset} 
                             onChange={(e) => setActivePreset(e.target.value as Preset)}
-                            className="w-48 h-9 text-sm"
+                            className={cn("w-48 h-9 text-sm", isPreviewFullScreen && fullScreenSelectClasses)}
                         >
                             {PRESETS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                         </Select>
                     )}
-                    <Button variant="ghost" size="icon" onClick={toggleFullScreen} className="h-9 w-9">
+                    <Button
+                        size="icon"
+                        onClick={toggleFullScreen}
+                        variant={isPreviewFullScreen ? undefined : 'ghost'}
+                        className={cn("h-9 w-9", isPreviewFullScreen && fullScreenIconButtonClasses)}
+                    >
                         {isPreviewFullScreen ? <XIcon className="w-5 h-5" /> : <ExpandIcon className="w-5 h-5" />}
                     </Button>
                 </div>
