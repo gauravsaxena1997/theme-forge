@@ -41,15 +41,13 @@ const Slider: React.FC<SliderProps> = ({
     <div
       className={cn(
         'relative flex w-full touch-none select-none items-center',
-        // FIX: The `cn` utility in this project doesn't support object syntax for conditional classes.
-        // Switched to using logical AND to apply classes when `disabled` is true.
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
     >
-      <div ref={trackRef} className="relative h-2 w-full grow overflow-hidden rounded-full bg-[var(--color-secondary)]/20">
+      <div ref={trackRef} className="relative h-2 w-full grow overflow-hidden rounded-full bg-zinc-200">
         <div
-          className="absolute h-full bg-[var(--color-primary)]"
+          className="absolute h-full bg-blue-600"
           style={{ width: `${percentage}%` }}
         />
       </div>

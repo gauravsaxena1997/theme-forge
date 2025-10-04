@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface TabsContextProps {
@@ -45,7 +44,7 @@ const Tabs: React.FC<TabsProps> = ({ defaultValue, value, onValueChange, childre
 };
 
 const TabsList: React.FC<{ children: ReactNode; className?: string }> = ({ children, className }) => (
-  <div className={`inline-flex h-10 items-center justify-center rounded-md bg-[var(--color-muted)] p-1 text-[var(--color-muted-foreground)] ${className}`}>
+  <div className={`inline-flex h-10 items-center justify-center rounded-md bg-zinc-100 p-1 text-zinc-500 ${className}`}>
     {children}
   </div>
 );
@@ -56,7 +55,7 @@ const TabsTrigger: React.FC<{ value: string; children: ReactNode; className?: st
   return (
     <button
       onClick={() => onValueChange(value)}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${isActive ? 'bg-[var(--color-background)] text-[var(--color-foreground)] shadow-sm' : ''} ${className}`}
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${isActive ? 'bg-white text-zinc-900 shadow-sm' : ''} ${className}`}
     >
       {children}
     </button>

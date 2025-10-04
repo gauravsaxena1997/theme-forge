@@ -1,9 +1,7 @@
-
 import React, { useCallback, useState, useEffect } from 'react';
 import { useThemeForge } from '../../state/ThemeContext';
 import { produce } from 'immer';
 import { Slider } from '../ui/Slider';
-import { Input } from '../ui/Input';
 
 interface ShadowParts {
     x: number;
@@ -29,12 +27,12 @@ const parseShadow = (shadowString: string): ShadowParts => {
         };
     }
      // Fallback for simpler shadows like "0 1px 2px 0 rgba(0,0,0,0.05)"
-    const simpleMatch = shadowString.match(/(-?\d+)px\s(-?\d+)px\s(\d+)px\srgba\((\d+,\s*\d+,\s*\d+),\s*([\d.]+)\)/);
+    const simpleMatch = shadowString.match(/(-?\d+(?:\.\d+)?|\d+)px\s(-?\d+(?:\.\d+)?|\d+)px\s(-?\d+(?:\.\d+)?|\d+)px\s*rgba\((\d+,\s*\d+,\s*\d+),\s*([\d.]+)\)/);
      if (simpleMatch) {
         return {
-            x: parseInt(simpleMatch[1], 10),
-            y: parseInt(simpleMatch[2], 10),
-            blur: parseInt(simpleMatch[3], 10),
+            x: parseFloat(simpleMatch[1]),
+            y: parseFloat(simpleMatch[2]),
+            blur: parseFloat(simpleMatch[3]),
             spread: 0,
             color: `rgb(${simpleMatch[4]})`,
             opacity: parseFloat(simpleMatch[5]),
@@ -46,7 +44,7 @@ const parseShadow = (shadowString: string): ShadowParts => {
 
 const formatShadow = (parts: ShadowParts): string => {
     const rgb = parts.color.match(/\d+/g)?.join(', ');
-    return `${parts.x}px ${parts.y}px ${parts.blur}px ${parts.spread}px rgba(${rgb}, ${parts.opacity.toFixed(2)})`;
+    return `${parts.x}px ${parts.y}px ${parts.blur}px ${parts.spread}px rgba(${rgb || '0, 0, 0'}, ${parts.opacity.toFixed(2)})`;
 };
 
 const ShadowEditor: React.FC<{ name: string; value: string; onChange: (value: string) => void; }> = ({ name, value, onChange }) => {
@@ -61,14 +59,14 @@ const ShadowEditor: React.FC<{ name: string; value: string; onChange: (value: st
     };
     
     return (
-        <div className="p-4 border border-[var(--color-border)] rounded-md space-y-4 bg-[var(--color-card)]">
+        <div className="p-4 border border-zinc-200 rounded-md space-y-4 bg-white">
             <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium capitalize">{name}</h4>
-                 <div className="w-24 h-12 rounded-md flex items-center justify-center bg-[var(--color-background)]" style={{ boxShadow: value }}>
-                    <span className="text-xs text-[var(--color-muted-foreground)]"></span>
+                <h4 className="text-sm font-medium capitalize text-zinc-900">{name}</h4>
+                 <div className="w-24 h-12 rounded-md flex items-center justify-center bg-zinc-50 border border-zinc-200" style={{ boxShadow: value }}>
+                    <span className="text-xs text-zinc-500"></span>
                 </div>
             </div>
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-1 gap-3 text-zinc-700">
                 <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2"><label className="text-xs">Offset X</label><Slider value={[parts.x]} onValueChange={([v]) => handlePartChange('x', v)} min={-20} max={20} step={1} /><span className="text-xs text-right">{parts.x}px</span></div>
                 <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2"><label className="text-xs">Offset Y</label><Slider value={[parts.y]} onValueChange={([v]) => handlePartChange('y', v)} min={-20} max={20} step={1} /><span className="text-xs text-right">{parts.y}px</span></div>
                 <div className="grid grid-cols-[80px_1fr_40px] items-center gap-2"><label className="text-xs">Blur</label><Slider value={[parts.blur]} onValueChange={([v]) => handlePartChange('blur', v)} min={0} max={40} step={1} /><span className="text-xs text-right">{parts.blur}px</span></div>
@@ -93,7 +91,7 @@ const ShadowsPanel: React.FC = () => {
     return (
         <div className="space-y-6 py-4">
             <div>
-                <h3 className="text-lg font-semibold mb-3">Shadows</h3>
+                <h3 className="text-lg font-semibold mb-3 text-zinc-900">Shadows</h3>
                 <div className="space-y-4">
                     {Object.entries(shadows.scale).map(([key, value]) => (
                         <ShadowEditor key={key} name={key} value={value} onChange={(newValue) => handleChange(key, newValue)} />

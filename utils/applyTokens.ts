@@ -1,68 +1,66 @@
-
-import { ModeTokens, Mode } from '../types/tokens';
+import { ThemeTokens, ModeTokens } from '../types/tokens';
 
 function toKebabCase(str: string): string {
     return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
 }
 
-export function applyTokensToCSS(modeTokens: ModeTokens, mode: Mode) {
-  const root = document.documentElement;
-  
-  // Clear previous styles to prevent light/dark mode bleed
-  root.style.cssText = '';
+function generateCssVariablesForMode(modeTokens: ModeTokens): string {
+    let variables = '';
 
-  const resolveRole = (role: string): string => {
-    const def = modeTokens.semanticColors[role];
-    if (!def) return 'transparent'; // Fallback for undefined roles
-    const scale = modeTokens.colorScales[def.scaleRef] || {};
-    return scale[def.shade] || '#FF0000'; // Fallback for undefined shades
-  };
-
-  // Semantic colors
-  for (const role in modeTokens.semanticColors) {
-    root.style.setProperty(`--color-${toKebabCase(role)}`, resolveRole(role));
-  }
-  
-  // Raw color scales for utility
-  for (const scaleName in modeTokens.colorScales) {
-    for (const shade in modeTokens.colorScales[scaleName]) {
-      root.style.setProperty(`--color-${toKebabCase(scaleName)}-${shade}`, modeTokens.colorScales[scaleName][shade as any]!);
+    for (const role in modeTokens.semanticColors) {
+        const colorValue = modeTokens.semanticColors[role] || 'transparent';
+        variables += `--color-${toKebabCase(role)}: ${colorValue};\n`;
     }
-  }
 
-  // Typography
-  root.style.setProperty('--font-heading', modeTokens.typography.fontFamilies.heading);
-  root.style.setProperty('--font-body', modeTokens.typography.fontFamilies.body);
-  if(modeTokens.typography.fontFamilies.mono) {
-    root.style.setProperty('--font-mono', modeTokens.typography.fontFamilies.mono);
-  }
-  Object.entries(modeTokens.typography.sizes).forEach(([k, v]) => root.style.setProperty(`--size-${k}`, v));
-  Object.entries(modeTokens.typography.lineHeights).forEach(([k, v]) => root.style.setProperty(`--lh-${k}`, v));
-  Object.entries(modeTokens.typography.weights).forEach(([k, v]) => root.style.setProperty(`--weight-${k}`, String(v)));
-  if (modeTokens.typography.letterSpacings) {
-    Object.entries(modeTokens.typography.letterSpacings).forEach(([k, v]) => root.style.setProperty(`--tracking-${k}`, v));
-  }
-  
-  // Spacing (add px unit)
-  Object.entries(modeTokens.spacing.scale).forEach(([k, v]) => root.style.setProperty(`--space-${k}`, `${v}px`));
-
-  // Radius (add px unit)
-  Object.entries(modeTokens.radius.scale).forEach(([k, v]) => {
-    if (k === 'full') {
-        root.style.setProperty(`--radius-${k}`, `9999px`);
-    } else {
-        root.style.setProperty(`--radius-${k}`, `${v}px`);
+    variables += `--font-heading: ${modeTokens.typography.fontFamilies.heading};\n`;
+    variables += `--font-body: ${modeTokens.typography.fontFamilies.body};\n`;
+    if (modeTokens.typography.fontFamilies.mono) {
+        variables += `--font-mono: ${modeTokens.typography.fontFamilies.mono};\n`;
     }
-  });
-  
-  // Shadows
-  Object.entries(modeTokens.shadows.scale).forEach(([k, v]) => root.style.setProperty(`--shadow-${k}`, v));
-  
-  // Z-Index
-  Object.entries(modeTokens.zIndex.scale).forEach(([k, v]) => root.style.setProperty(`--z-${k}`, String(v)));
 
-  // Borders
-  if (modeTokens.borders) {
-    Object.entries(modeTokens.borders.widths).forEach(([k, v]) => root.style.setProperty(`--border-width-${k}`, v));
-  }
+    Object.entries(modeTokens.typography.sizes).forEach(([k, v]) => variables += `--size-${k}: ${v};\n`);
+    Object.entries(modeTokens.typography.lineHeights).forEach(([k, v]) => variables += `--lh-${k}: ${v};\n`);
+    Object.entries(modeTokens.typography.weights).forEach(([k, v]) => variables += `--weight-${k}: ${String(v)};\n`);
+    
+    if (modeTokens.typography.letterSpacings) {
+      Object.entries(modeTokens.typography.letterSpacings).forEach(([k, v]) => variables += `--tracking-${k}: ${v};\n`);
+    }
+
+    Object.entries(modeTokens.spacing.scale).forEach(([k, v]) => variables += `--space-${k}: ${v}px;\n`);
+
+    Object.entries(modeTokens.radius.scale).forEach(([k, v]) => {
+        const radiusValue = k === 'full' ? '9999px' : `${v}px`;
+        variables += `--radius-${k}: ${radiusValue};\n`;
+    });
+
+    Object.entries(modeTokens.shadows.scale).forEach(([k, v]) => variables += `--shadow-${k}: ${v};\n`);
+    Object.entries(modeTokens.zIndex.scale).forEach(([k, v]) => variables += `--z-${k}: ${String(v)};\n`);
+    
+    if (modeTokens.borders) {
+        Object.entries(modeTokens.borders.widths).forEach(([k, v]) => variables += `--border-width-${k}: ${v};\n`);
+    }
+
+    return variables;
+}
+
+export function applyScopedTokensToStyleTag(tokens: ThemeTokens) {
+    const styleTagId = 'theme-forge-styles';
+    let styleTag = document.getElementById(styleTagId) as HTMLStyleElement | null;
+    if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = styleTagId;
+        document.head.appendChild(styleTag);
+    }
+
+    const lightCss = generateCssVariablesForMode(tokens.light);
+    const darkCss = generateCssVariablesForMode(tokens.dark);
+
+    styleTag.textContent = `
+        #theme-preview-content.light {
+            ${lightCss}
+        }
+        #theme-preview-content.dark {
+            ${darkCss}
+        }
+    `;
 }

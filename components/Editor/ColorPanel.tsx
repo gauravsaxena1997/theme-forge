@@ -1,90 +1,68 @@
-
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useThemeForge } from '../../state/ThemeContext';
-import { ShadeStop } from '../../types/tokens';
-import { generateOklchScale, SHADE_STOPS, hexToOklch } from '../../utils/colorUtils';
+import { hexToOklch } from '../../utils/colorUtils';
 import { produce } from 'immer';
 
-// Memoized color swatch component
-const ColorSwatch = React.memo(({ color }: { color: string }) => (
-    <div className="w-full h-8 rounded" style={{ backgroundColor: color }} />
-));
+// Utility to format role names for display
+const formatRoleName = (role: string) => {
+    return role
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, (str) => str.toUpperCase());
+};
+
+const ColorEditorRow: React.FC<{ role: string; color: string; onChange: (hexColor: string) => void }> = ({ role, color, onChange }) => {
+    return (
+        <div className="flex items-center justify-between p-2 rounded-md hover:bg-zinc-100/50">
+            <label className="text-sm font-medium text-zinc-800">{formatRoleName(role)}</label>
+            <div className="relative w-8 h-8 rounded-md overflow-hidden border border-zinc-300 cursor-pointer">
+                <div className="absolute inset-0" style={{ backgroundColor: color }}></div>
+                <input
+                    type="color"
+                    defaultValue="#000000" 
+                    onChange={(e) => onChange(e.target.value)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    title={`Change ${role} color`}
+                />
+            </div>
+        </div>
+    );
+};
 
 const ColorPanel: React.FC = () => {
     const { setTokens, mode, activeModeTokens } = useThemeForge();
-    const { colorScales, semanticColors } = activeModeTokens;
+    const { semanticColors } = activeModeTokens;
 
-    const handleBaseColorChange = useCallback((scaleName: string, hexColor: string) => {
-        const newBaseOklch = hexToOklch(hexColor);
+    const handleColorChange = useCallback((role: string, hexColor: string) => {
+        const newOklchColor = hexToOklch(hexColor);
         setTokens(
             produce((draft) => {
-                const newScale = generateOklchScale(newBaseOklch, mode);
-                draft[mode].colorScales[scaleName] = newScale;
+                draft[mode].semanticColors[role] = newOklchColor;
             })
         );
     }, [setTokens, mode]);
-    
-    const handleSemanticChange = useCallback((role: string, scaleRef: string, shade: ShadeStop) => {
-        setTokens(
-            produce((draft) => {
-                draft[mode].semanticColors[role] = { scaleRef, shade };
-            })
-        );
-    }, [setTokens, mode]);
+
+    const colorRoles = Object.entries(semanticColors).sort(([a], [b]) => a.localeCompare(b));
+
+    const structuralColors = colorRoles.filter(([k]) => ['background', 'foreground', 'border', 'card', 'cardForeground', 'muted', 'mutedForeground'].includes(k));
+    const brandColors = colorRoles.filter(([k]) => ['primary', 'primaryForeground', 'accent', 'accentForeground'].includes(k));
+    const feedbackColors = colorRoles.filter(([k]) => ['warning', 'danger'].includes(k));
 
     return (
-        <div className="space-y-8 py-4">
+        <div className="space-y-6 py-4">
             <div>
-                <h3 className="text-lg font-semibold mb-3">Core Palettes</h3>
-                <div className="space-y-5">
-                    {Object.entries(colorScales).map(([name, scale]) => {
-                        const baseColor = scale[mode === 'light' ? 600 : 500] || 'oklch(0 0 0)';
-                        return (
-                            <div key={name} className="p-3 border border-[var(--color-border)] rounded-md bg-[var(--color-card)]">
-                                <div className="flex items-center justify-between mb-2">
-                                    <label className="capitalize font-medium text-sm">{name}</label>
-                                    <div className="relative w-8 h-8 rounded-md overflow-hidden border border-[var(--color-border)]">
-                                        <div className="absolute inset-0" style={{ backgroundColor: baseColor }}></div>
-                                        <input
-                                            type="color"
-                                            // The value must be hex. We will convert on change.
-                                            // This is a limitation of input[type=color].
-                                            defaultValue="#000000"
-                                            onChange={(e) => handleBaseColorChange(name, e.target.value)}
-                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                            title={`Change ${name} base color`}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="flex space-x-1">
-                                    {SHADE_STOPS.map((stop) => (
-                                        <div key={stop} title={`${name}-${stop}: ${scale[stop]}`} className="w-full">
-                                          <ColorSwatch color={scale[stop] ?? 'transparent'} />
-                                          <p className="text-center text-xs mt-1 text-[var(--color-muted-foreground)]">{stop}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
-            </div>
-
-            <div>
-                <h3 className="text-lg font-semibold mb-3">UI Color Roles</h3>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                    {Object.entries(semanticColors).sort(([a], [b]) => a.localeCompare(b)).map(([role, { scaleRef, shade }]) => (
-                        <div key={role} className="flex flex-col space-y-1">
-                            <label className="text-xs text-[var(--color-muted-foreground)] capitalize">{role.replace(/-/g, ' ')}</label>
-                            <div className="flex gap-2">
-                                <select value={scaleRef} onChange={(e) => handleSemanticChange(role, e.target.value, shade)} className="w-full text-sm p-1.5 border rounded-md bg-[var(--color-card)] border-[var(--color-border)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
-                                    {Object.keys(colorScales).map(name => <option key={name} value={name}>{name}</option>)}
-                                </select>
-                                <select value={shade} onChange={(e) => handleSemanticChange(role, scaleRef, parseInt(e.target.value) as ShadeStop)} className="w-24 text-sm p-1.5 border rounded-md bg-[var(--color-card)] border-[var(--color-border)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]">
-                                    {SHADE_STOPS.map(s => <option key={s} value={s}>{s}</option>)}
-                                </select>
-                            </div>
-                        </div>
+                <h3 className="text-lg font-semibold mb-2 text-zinc-900">UI Colors</h3>
+                <div className="p-2 border border-zinc-200 rounded-md bg-white space-y-1">
+                    <h4 className="px-2 py-1 text-xs font-semibold text-zinc-500">Brand</h4>
+                    {brandColors.map(([role, color]) => (
+                        <ColorEditorRow key={role} role={role} color={color} onChange={(hex) => handleColorChange(role, hex)} />
+                    ))}
+                     <h4 className="px-2 pt-2 pb-1 text-xs font-semibold text-zinc-500">Structure</h4>
+                     {structuralColors.map(([role, color]) => (
+                        <ColorEditorRow key={role} role={role} color={color} onChange={(hex) => handleColorChange(role, hex)} />
+                    ))}
+                    <h4 className="px-2 pt-2 pb-1 text-xs font-semibold text-zinc-500">Feedback</h4>
+                     {feedbackColors.map(([role, color]) => (
+                        <ColorEditorRow key={role} role={role} color={color} onChange={(hex) => handleColorChange(role, hex)} />
                     ))}
                 </div>
             </div>

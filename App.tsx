@@ -1,23 +1,19 @@
-
-import React, { useState } from 'react';
-import { ThemeProvider, useThemeForge } from './state/ThemeContext';
+import React from 'react';
+import { ThemeProvider } from './state/ThemeContext';
 import Header from './components/Header';
 import EditorTabs from './components/Editor/EditorTabs';
 import PreviewSwitcher from './components/Preview/PreviewSwitcher';
 
 const AppContent: React.FC = () => {
-    const { mode } = useThemeForge();
-    const [activePreview, setActivePreview] = useState('Dashboard');
-
     return (
-        <div className={`flex flex-col h-screen font-sans antialiased bg-[var(--color-background)] text-[var(--color-foreground)] transition-colors duration-200 ${mode}`}>
+        <div className="flex flex-col h-screen font-sans antialiased bg-white text-zinc-900">
             <Header />
             <main className="flex-1 grid grid-cols-1 md:grid-cols-[500px_1fr] overflow-hidden">
-                <aside className="border-r border-[var(--color-border)] overflow-y-auto">
+                <aside className="bg-white border-r border-zinc-200 overflow-y-auto">
                     <EditorTabs />
                 </aside>
-                <section className="bg-[var(--color-muted)]/30 overflow-y-auto">
-                    <PreviewSwitcher activePreview={activePreview} setActivePreview={setActivePreview} />
+                <section className="bg-zinc-50 overflow-y-auto">
+                    <PreviewSwitcher />
                 </section>
             </main>
         </div>

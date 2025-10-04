@@ -1,7 +1,6 @@
-
 import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import { ThemeTokens, Mode } from '../types/tokens';
-import { applyTokensToCSS } from '../utils/applyTokens';
+import { applyScopedTokensToStyleTag } from '../utils/applyTokens';
 import { defaultPreset } from '../data/defaultPreset';
 
 type ThemeCtx = {
@@ -23,10 +22,8 @@ export const ThemeProvider: React.FC<React.PropsWithChildren<{}>> = ({ children 
   };
   
   useEffect(() => {
-    const activeTokens = tokens[mode];
-    applyTokensToCSS(activeTokens, mode);
-    document.documentElement.className = mode;
-  }, [tokens, mode]);
+    applyScopedTokensToStyleTag(tokens);
+  }, [tokens]);
 
   const value = useMemo(() => ({
     tokens,
