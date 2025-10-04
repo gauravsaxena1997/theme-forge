@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
 import ColorPanel from './ColorPanel';
 import TypographyPanel from './TypographyPanel';
@@ -12,12 +12,12 @@ const EditorTabs: React.FC = () => {
             <TabsList>
                 <TabsTrigger value="colors">Colors</TabsTrigger>
                 <TabsTrigger value="typography">Typography</TabsTrigger>
-                <TabsTrigger value="spacing">Spacing/Radius</TabsTrigger>
+                <TabsTrigger value="layout">Layout</TabsTrigger>
                 <TabsTrigger value="shadows">Shadows</TabsTrigger>
             </TabsList>
             <TabsContent value="colors"><ColorPanel /></TabsContent>
             <TabsContent value="typography"><TypographyPanel /></TabsContent>
-            <TabsContent value="spacing"><SpacingRadiusPanel /></TabsContent>
+            <TabsContent value="layout"><SpacingRadiusPanel /></TabsContent>
             <TabsContent value="shadows"><ShadowsPanel /></TabsContent>
         </Tabs>
     );

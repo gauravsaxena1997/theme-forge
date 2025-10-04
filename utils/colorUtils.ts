@@ -27,20 +27,56 @@ export const generateOklchScale = (baseColor: string, mode: 'light' | 'dark' = '
 
   const scale = {} as Record<ShadeStop, string>;
   for (const stop of SHADE_STOPS) {
-      scale[stop] = formatOklch(lMap[stop], cMap[stop], baseH);
+      scale[stop] = formatOklch(lMap[stop], cMap[stop], isNaN(baseH) ? 0 : baseH);
   }
   return scale;
 };
 
-// Simplified HEX to RGB conversion for basic contrast check
-const hexToRgb = (hex: string): [number, number, number] | null => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
-};
+
+// --- Color Conversion Utilities for Color Picker ---
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+}
+
+function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+
+  return { h: h * 360, s, l };
+}
+
+
+// Approximates an OKLCH color from a HEX input for the color picker
+export function hexToOklch(hex: string): string {
+    const rgb = hexToRgb(hex);
+    if (!rgb) return 'oklch(0 0 0)';
+    const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+    // This is a rough approximation to map HSL to OKLCH parameters
+    // We use HSL's hue directly.
+    // We map HSL's lightness to OKLCH's lightness and saturation to chroma.
+    const l = hsl.l * 0.9 + 0.05; // clamp lightness to a reasonable range
+    const c = hsl.s * 0.15; // scale saturation to a reasonable chroma
+    
+    return formatOklch(l, c, hsl.h);
+}
+
 
 // This is a simplified contrast checker and does not convert OKLCH.
-// A full OKLCH -> sRGB conversion is very complex. We'll use a placeholder logic.
-// For a real app, a library like `culori` would be needed.
 export const getContrastRatio = (fg: string, bg: string): number => {
   // Placeholder: Return a fixed high contrast ratio if colors are different
   if (fg.toLowerCase() !== bg.toLowerCase()) {

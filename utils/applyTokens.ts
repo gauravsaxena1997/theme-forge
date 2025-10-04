@@ -43,11 +43,17 @@ export function applyTokensToCSS(modeTokens: ModeTokens, mode: Mode) {
     Object.entries(modeTokens.typography.letterSpacings).forEach(([k, v]) => root.style.setProperty(`--tracking-${k}`, v));
   }
   
-  // Spacing
-  Object.entries(modeTokens.spacing.scale).forEach(([k, v]) => root.style.setProperty(`--space-${k}`, v));
+  // Spacing (add px unit)
+  Object.entries(modeTokens.spacing.scale).forEach(([k, v]) => root.style.setProperty(`--space-${k}`, `${v}px`));
 
-  // Radius
-  Object.entries(modeTokens.radius.scale).forEach(([k, v]) => root.style.setProperty(`--radius-${k}`, v));
+  // Radius (add px unit)
+  Object.entries(modeTokens.radius.scale).forEach(([k, v]) => {
+    if (k === 'full') {
+        root.style.setProperty(`--radius-${k}`, `9999px`);
+    } else {
+        root.style.setProperty(`--radius-${k}`, `${v}px`);
+    }
+  });
   
   // Shadows
   Object.entries(modeTokens.shadows.scale).forEach(([k, v]) => root.style.setProperty(`--shadow-${k}`, v));
