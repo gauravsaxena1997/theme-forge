@@ -1,0 +1,5 @@
+{
+  "name": "ThemeForge",
+  "description": "A client-side theme generator for creating and previewing design tokens for shadcn/ui compatible themes in real-time. Edit colors, typography, spacing, and more, and export the theme as JSON.",
+  "requestFramePermissions": []
+}
