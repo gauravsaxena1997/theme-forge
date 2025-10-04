@@ -1,3 +1,4 @@
+
 import React, { useCallback } from 'react';
 import { useThemeForge } from '../../state/ThemeContext';
 import { hexToOklch } from '../../utils/colorUtils';
@@ -41,11 +42,24 @@ const ColorPanel: React.FC = () => {
         );
     }, [setTokens, mode]);
 
-    const colorRoles = Object.entries(semanticColors).sort(([a], [b]) => a.localeCompare(b));
+    const colorRoles = Object.entries(semanticColors);
 
-    const structuralColors = colorRoles.filter(([k]) => ['background', 'foreground', 'border', 'card', 'cardForeground', 'muted', 'mutedForeground'].includes(k));
-    const brandColors = colorRoles.filter(([k]) => ['primary', 'primaryForeground', 'accent', 'accentForeground'].includes(k));
-    const feedbackColors = colorRoles.filter(([k]) => ['warning', 'danger'].includes(k));
+    // Define the explicit order for brand colors
+    const brandOrder = ['primary', 'primaryForeground', 'accent', 'accentForeground'];
+
+    const structuralColors = colorRoles
+        .filter(([k]) => ['background', 'foreground', 'border', 'card', 'cardForeground', 'muted', 'mutedForeground'].includes(k))
+        .sort(([a], [b]) => a.localeCompare(b));
+    
+    const brandColors = colorRoles
+        .filter(([k]) => brandOrder.includes(k))
+        .sort(([a], [b]) => brandOrder.indexOf(a) - brandOrder.indexOf(b));
+
+    const feedbackOrder = ['success', 'warning', 'danger'];
+    const feedbackColors = colorRoles
+        .filter(([k]) => feedbackOrder.includes(k))
+        .sort(([a], [b]) => feedbackOrder.indexOf(a) - feedbackOrder.indexOf(b));
+
 
     return (
         <div className="space-y-6 py-4">

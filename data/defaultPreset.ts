@@ -21,6 +21,7 @@ export const defaultPreset: ThemeTokens = {
       border: 'oklch(0.90 0.01 260)',
       warning: 'oklch(0.7 0.15 80)',
       danger: 'oklch(0.6 0.18 25)',
+      success: 'oklch(0.65 0.15 150)',
     },
     typography: {
       fontFamilies: { heading: "Inter, sans-serif", body: "Roboto, sans-serif", mono: "JetBrains Mono, monospace" },
@@ -49,6 +50,7 @@ export const defaultPreset: ThemeTokens = {
       border: 'oklch(0.40 0.01 260)',
       warning: 'oklch(0.75 0.15 80)',
       danger: 'oklch(0.65 0.18 25)',
+      success: 'oklch(0.7 0.15 150)',
     },
     typography: {
       fontFamilies: { heading: "Inter, sans-serif", body: "Roboto, sans-serif", mono: "JetBrains Mono, monospace" },

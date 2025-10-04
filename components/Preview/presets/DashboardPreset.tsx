@@ -60,7 +60,7 @@ const DashboardPreset: React.FC = () => {
                                 </div>
                                 <div className="text-right">
                                     <div className="font-medium">{t.amount}</div>
-                                    <Badge variant={t.status === 'Paid' ? 'secondary' : t.status === 'Pending' ? 'outline' : 'destructive'} className="text-xs">{t.status}</Badge>
+                                    <Badge variant={t.status === 'Paid' ? 'success' : t.status === 'Pending' ? 'outline' : 'destructive'} className="text-xs">{t.status}</Badge>
                                 </div>
                             </div>
                         ))}

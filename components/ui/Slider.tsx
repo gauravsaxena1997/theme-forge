@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '../../lib/utils';
 
 interface SliderProps {
@@ -21,13 +21,12 @@ const Slider: React.FC<SliderProps> = ({
   className,
 }) => {
   const [localValue, setLocalValue] = useState(value[0]);
-  const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLocalValue(value[0]);
   }, [value]);
 
-  const percentage = ((localValue - min) / (max - min)) * 100;
+  const percentage = max > min ? ((localValue - min) / (max - min)) * 100 : 0;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseFloat(e.target.value);
@@ -40,17 +39,21 @@ const Slider: React.FC<SliderProps> = ({
   return (
     <div
       className={cn(
-        'relative flex w-full touch-none select-none items-center',
+        'relative flex w-full touch-none select-none items-center py-2',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
     >
-      <div ref={trackRef} className="relative h-2 w-full grow overflow-hidden rounded-full bg-zinc-200">
+      <div className="relative h-2 w-full grow overflow-hidden rounded-full bg-zinc-200">
         <div
           className="absolute h-full bg-blue-600"
           style={{ width: `${percentage}%` }}
         />
       </div>
+      <div
+        className="absolute block h-5 w-5 rounded-full border-2 border-blue-600 bg-white ring-offset-white transition-colors"
+        style={{ left: `calc(${percentage}% - 10px)` }}
+       />
        <input
             type="range"
             min={min}
@@ -59,7 +62,7 @@ const Slider: React.FC<SliderProps> = ({
             value={localValue}
             onChange={handleChange}
             disabled={disabled}
-            className="absolute w-full h-2 opacity-0 cursor-pointer"
+            className="absolute w-full h-full opacity-0 cursor-pointer"
         />
     </div>
   );

@@ -3,15 +3,16 @@ import React from 'react';
 import { cn } from '../../lib/utils';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'secondary' | 'destructive' | 'outline';
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'success';
 }
 
 function Badge({ className, variant = 'default', ...props }: BadgeProps) {
   const variants = {
     default: 'border-transparent bg-[var(--color-primary)] text-[var(--color-primary-foreground)]',
-    secondary: 'border-transparent bg-[var(--color-secondary)] text-[var(--color-secondary-foreground)]',
+    secondary: 'border-transparent bg-[var(--color-muted)] text-[var(--color-muted-foreground)]',
     destructive: 'border-transparent bg-[var(--color-danger)]/90 text-[var(--color-primary-foreground)]',
     outline: 'text-[var(--color-foreground)]',
+    success: 'border-transparent bg-[var(--color-success)] text-[var(--color-primary-foreground)]',
   };
   return (
     <div

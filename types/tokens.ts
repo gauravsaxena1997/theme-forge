@@ -3,7 +3,7 @@ export type Mode = 'light' | 'dark';
 export type ColorRole =
   | 'primary' | 'primaryForeground'
   | 'accent' | 'accentForeground'
-  | 'warning' | 'danger'
+  | 'warning' | 'danger' | 'success'
   | 'background' | 'foreground'
   | 'card' | 'cardForeground'
   | 'muted' | 'mutedForeground'
