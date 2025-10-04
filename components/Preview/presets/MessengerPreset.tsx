@@ -5,6 +5,7 @@ import { Input } from '../../ui/Input';
 import { Avatar } from '../../ui/Avatar';
 import { Badge } from '../../ui/Badge';
 import { SearchIcon, MoreVerticalIcon, SendIcon, PaperclipIcon, UserIcon } from '../../icons';
+import { useToast } from '../../ui/Toast';
 
 const contacts = [
     { name: 'Elena Rodriguez', lastMessage: 'See you tomorrow!', time: '10:42 AM', unread: 2, online: true },
@@ -15,6 +16,7 @@ const contacts = [
 ];
 
 const MessengerPreset: React.FC = () => {
+    const { toast } = useToast();
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 h-[80vh] gap-4">
             {/* Sidebar */}
@@ -28,7 +30,7 @@ const MessengerPreset: React.FC = () => {
                 </div>
                 <div className="flex-1 overflow-y-auto">
                     {contacts.map(contact => (
-                        <div key={contact.name} className="flex items-center gap-3 p-3 hover:bg-[var(--color-accent)]/20 cursor-pointer border-b border-[var(--color-border)]">
+                        <button key={contact.name} className="flex items-center gap-3 p-3 w-full text-left hover:bg-[var(--color-accent)]/20 cursor-pointer border-b border-[var(--color-border)]" onClick={() => toast(`Opening chat with ${contact.name}`, 'info')}>
                             <div className="relative">
                                 <Avatar><UserIcon className="w-5 h-5"/></Avatar>
                                 {contact.online && <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-[var(--color-card)]" />}
@@ -41,7 +43,7 @@ const MessengerPreset: React.FC = () => {
                                 <p className="text-[var(--color-muted-foreground)]">{contact.time}</p>
                                 {contact.unread && <Badge className="mt-1">{contact.unread}</Badge>}
                             </div>
-                        </div>
+                        </button>
                     ))}
                 </div>
             </Card>
@@ -56,7 +58,7 @@ const MessengerPreset: React.FC = () => {
                             <p className="text-xs text-green-500">Online</p>
                          </div>
                     </div>
-                    <Button variant="ghost" size="icon"><MoreVerticalIcon className="w-5 h-5"/></Button>
+                    <Button variant="ghost" size="icon" onClick={() => toast('Showing chat options', 'info')}><MoreVerticalIcon className="w-5 h-5"/></Button>
                 </header>
                 <CardContent className="flex-1 p-4 space-y-4 overflow-y-auto">
                     {/* Received */}
@@ -76,9 +78,9 @@ const MessengerPreset: React.FC = () => {
                 </CardContent>
                 <footer className="p-4 border-t border-[var(--color-border)] shrink-0">
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon"><PaperclipIcon className="w-5 h-5" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => toast('Attach a file', 'info')}><PaperclipIcon className="w-5 h-5" /></Button>
                         <Input placeholder="Type a message" className="flex-1" />
-                        <Button><SendIcon className="w-5 h-5" /></Button>
+                        <Button onClick={() => toast('Message sent!', 'success')}><SendIcon className="w-5 h-5" /></Button>
                     </div>
                 </footer>
             </Card>

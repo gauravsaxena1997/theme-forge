@@ -4,8 +4,10 @@ import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { Avatar } from '../../ui/Avatar';
 import { BotIcon, SendIcon, UserIcon } from '../../icons';
+import { useToast } from '../../ui/Toast';
 
 const ChatPreset: React.FC = () => {
+    const { toast } = useToast();
     return (
         <div className="flex flex-col h-[70vh] max-w-3xl mx-auto">
             <header className="text-center mb-4">
@@ -52,7 +54,7 @@ const ChatPreset: React.FC = () => {
                 <div className="p-4 border-t border-[var(--color-border)]">
                     <div className="relative">
                         <Input placeholder="Type your message..." className="pr-12" />
-                        <Button size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8">
+                        <Button size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8" onClick={() => toast('Message sent!', 'info')}>
                             <SendIcon className="w-4 h-4" />
                         </Button>
                     </div>

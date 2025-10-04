@@ -4,6 +4,7 @@ import { Button } from '../../ui/Button';
 import { Badge } from '../../ui/Badge';
 import { DollarSignIcon, UsersIcon, CreditCardIcon, ActivityIcon } from '../../icons';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useToast } from '../../ui/Toast';
 
 const chartData = [
   { name: 'Jan', total: 2431 }, { name: 'Feb', total: 3123 },
@@ -20,11 +21,12 @@ const transactions = [
 ];
 
 const DashboardPreset: React.FC = () => {
+    const { toast } = useToast();
     return (
         <div className="space-y-6">
             <header className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold tracking-tight" style={{fontFamily: 'var(--font-heading)'}}>Dashboard</h1>
-                <Button>Download Report</Button>
+                <Button onClick={() => toast('Report downloaded successfully!', 'success')}>Download Report</Button>
             </header>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
